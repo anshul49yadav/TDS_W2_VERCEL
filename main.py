@@ -1,9 +1,8 @@
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-import os
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-# Dummy data - marks of 100 students (for example)
+# Dummy data - marks of students
 student_marks = {
     "Alice": 10,
     "Bob": 20,
@@ -15,14 +14,7 @@ student_marks = {
 
 app = FastAPI()
 
-@app.get("/api")
-async def get_marks(name: list[str]):
-    marks = []
-    for n in name:
-        marks.append(student_marks.get(n, None))  # Get marks or None if not found.
-    return JSONResponse(content={"marks": marks})
-
-
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins
@@ -30,3 +22,8 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
+@app.get("/api")
+async def get_marks(name: list[str]):
+    marks = [student_marks.get(n, None) for n in name]
+    return JSONResponse(content={"marks": marks})
